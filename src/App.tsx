@@ -1,0 +1,88 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'sonner';
+import { ThemeProvider } from './components/theme/theme-provider';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { DashboardLayout } from './components/layout/DashboardLayout';
+import { LoginPage } from './pages/auth/LoginPage';
+import { RegisterPage } from './pages/auth/RegisterPage';
+import { DashboardHome } from './pages/dashboard/DashboardHome';
+import { CarsListPage } from './pages/cars/CarsListPage';
+import { CarFormPage } from './pages/cars/CarFormPage';
+import { PlaceholderPage } from './pages/PlaceholderPage';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      retry: 1,
+    },
+  },
+});
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="system">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<DashboardHome />} />
+
+              <Route path="cars" element={<CarsListPage />} />
+              <Route path="cars/new" element={<CarFormPage />} />
+              <Route path="cars/:id/edit" element={<CarFormPage />} />
+
+              <Route
+                path="gallerists"
+                element={<PlaceholderPage title="Gallerists" description="Manage gallerists" />}
+              />
+              <Route
+                path="customers"
+                element={<PlaceholderPage title="Customers" description="Manage customers" />}
+              />
+              <Route
+                path="sales"
+                element={<PlaceholderPage title="Sales" description="Manage sales" />}
+              />
+              <Route
+                path="inventory"
+                element={<PlaceholderPage title="Inventory" description="Manage car assignments" />}
+              />
+              <Route
+                path="accounts"
+                element={<PlaceholderPage title="Accounts" description="Manage accounts" />}
+              />
+              <Route
+                path="addresses"
+                element={<PlaceholderPage title="Addresses" description="Manage addresses" />}
+              />
+              <Route
+                path="analytics"
+                element={<PlaceholderPage title="Analytics" description="View reports and analytics" />}
+              />
+              <Route
+                path="settings"
+                element={<PlaceholderPage title="Settings" description="Application settings" />}
+              />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+        <Toaster position="top-right" richColors />
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
