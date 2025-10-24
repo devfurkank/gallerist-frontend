@@ -10,10 +10,11 @@ const mapBackendAddressToFrontend = (backendAddress: any): Address => ({
   district: backendAddress.district || '',
   neighborhood: backendAddress.neighborhood || '',
   street: backendAddress.street || '',
+  createdAt: backendAddress.createdAt,
+  updatedAt: backendAddress.updatedAt,
 });
 
 const mapFrontendAddressToBackend = (frontendAddress: CreateAddressRequest | UpdateAddressRequest): any => ({
-  id: (frontendAddress as UpdateAddressRequest).id,
   city: frontendAddress.city,
   district: frontendAddress.district,
   neighborhood: frontendAddress.neighborhood,
@@ -21,30 +22,52 @@ const mapFrontendAddressToBackend = (frontendAddress: CreateAddressRequest | Upd
 });
 
 export const addressesApi = {
+  /**
+   * Tüm adresleri getirir
+   * Backend endpoint: GET /rest/api/address/list
+   */
   getAll: async (): Promise<Address[]> => {
-    // Note: Backend doesn't have list endpoint yet
-    throw new Error('List endpoint not implemented in backend yet');
+    const response = await apiClient.get<RootEntity<any[]>>(`${ADDRESS_API}/list`);
+    return response.data.payload.map(mapBackendAddressToFrontend);
   },
 
+  /**
+   * Backend'de getById endpoint'i yok, bu yüzden liste üzerinden filtreleme yapıyoruz
+   */
   getById: async (id: string): Promise<Address> => {
-    // Note: Backend doesn't have getById endpoint yet
-    throw new Error('GetById endpoint not implemented in backend yet');
+    const addresses = await addressesApi.getAll();
+    const address = addresses.find(addr => addr.id === id);
+    if (!address) {
+      throw new Error(`Address with id ${id} not found`);
+    }
+    return address;
   },
 
+  /**
+   * Yeni adres oluşturur
+   * Backend endpoint: POST /rest/api/address/save
+   */
   create: async (data: CreateAddressRequest): Promise<Address> => {
     const backendData = mapFrontendAddressToBackend(data);
     const response = await apiClient.post<RootEntity<any>>(`${ADDRESS_API}/save`, backendData);
     return mapBackendAddressToFrontend(response.data.payload);
   },
 
+  /**
+   * Mevcut adresi günceller
+   * Backend endpoint: PUT /rest/api/address/update/{id}
+   */
   update: async (id: string, data: UpdateAddressRequest): Promise<Address> => {
-    const backendData = mapFrontendAddressToBackend({ ...data, id });
-    const response = await apiClient.post<RootEntity<any>>(`${ADDRESS_API}/save`, backendData);
+    const backendData = mapFrontendAddressToBackend(data);
+    const response = await apiClient.put<RootEntity<any>>(`${ADDRESS_API}/update/${id}`, backendData);
     return mapBackendAddressToFrontend(response.data.payload);
   },
 
+  /**
+   * Adresi siler
+   * Backend endpoint: DELETE /rest/api/address/delete/{id}
+   */
   delete: async (id: string): Promise<void> => {
-    // Note: Backend doesn't have delete endpoint yet
-    throw new Error('Delete endpoint not implemented in backend yet');
+    await apiClient.delete<RootEntity<string>>(`${ADDRESS_API}/delete/${id}`);
   },
 };

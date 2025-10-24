@@ -11,6 +11,8 @@ import { CarsListPage } from './pages/cars/CarsListPage';
 import { CarFormPage } from './pages/cars/CarFormPage';
 import { GalleristsListPage } from './pages/gallerists/GalleristsListPage';
 import { GalleristFormPage } from './pages/gallerists/GalleristFormPage';
+import { AddressesListPage } from './pages/addresses/AddressesListPage';
+import { AddressFormPage } from './pages/addresses/AddressFormPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 
 const queryClient = new QueryClient({
@@ -49,6 +51,11 @@ function App() {
               <Route path="gallerists" element={<GalleristsListPage />} />
               <Route path="gallerists/new" element={<GalleristFormPage />} />
               <Route path="gallerists/:id/edit" element={<GalleristFormPage />} />
+
+              <Route path="addresses" element={<AddressesListPage />} />
+              <Route path="addresses/new" element={<AddressFormPage />} />
+              <Route path="addresses/:id/edit" element={<AddressFormPage />} />
+              
               <Route
                 path="customers"
                 element={<PlaceholderPage title="Customers" description="Manage customers" />}
@@ -64,10 +71,6 @@ function App() {
               <Route
                 path="accounts"
                 element={<PlaceholderPage title="Accounts" description="Manage accounts" />}
-              />
-              <Route
-                path="addresses"
-                element={<PlaceholderPage title="Addresses" description="Manage addresses" />}
               />
               <Route
                 path="analytics"
