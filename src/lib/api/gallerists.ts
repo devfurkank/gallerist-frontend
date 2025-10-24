@@ -1,6 +1,7 @@
 import apiClient from './client';
-import { Gallerist, CreateGalleristRequest, UpdateGalleristRequest, RootEntity } from '../types';
+import { Gallerist, CreateGalleristRequest, UpdateGalleristRequest, GalleristWithAddressInput, RootEntity } from '../types';
 import { API_ENDPOINTS } from '../utils/constants';
+import { addressesApi } from './addresses';
 
 const GALLERIST_API = API_ENDPOINTS.GALLERIST;
 
@@ -20,27 +21,23 @@ const mapBackendGalleristToFrontend = (backendGallerist: any): Gallerist => ({
 });
 
 const mapFrontendGalleristToBackend = (frontendGallerist: CreateGalleristRequest | UpdateGalleristRequest): any => ({
-  id: (frontendGallerist as UpdateGalleristRequest).id,
   firstName: frontendGallerist.firstName,
   lastName: frontendGallerist.lastName,
-  address: frontendGallerist.address ? {
-    id: frontendGallerist.address.id,
-    city: frontendGallerist.address.city,
-    district: frontendGallerist.address.district,
-    neighborhood: frontendGallerist.address.neighborhood,
-    street: frontendGallerist.address.street,
-  } : undefined,
+  addressId: Number(frontendGallerist.addressId),
 });
 
 export const galleristsApi = {
   getAll: async (): Promise<Gallerist[]> => {
-    // Note: Backend doesn't have list endpoint yet
-    throw new Error('List endpoint not implemented in backend yet');
+    const response = await apiClient.get<RootEntity<any[]>>(`${GALLERIST_API}/list`);
+    return response.data.payload.map(mapBackendGalleristToFrontend);
   },
 
   getById: async (id: string): Promise<Gallerist> => {
-    // Note: Backend doesn't have getById endpoint yet
-    throw new Error('GetById endpoint not implemented in backend yet');
+    // Note: Backend doesn't have getById endpoint, using list and filter
+    const gallerists = await galleristsApi.getAll();
+    const gallerist = gallerists.find(g => g.id === id);
+    if (!gallerist) throw new Error('Gallerist not found');
+    return gallerist;
   },
 
   create: async (data: CreateGalleristRequest): Promise<Gallerist> => {
@@ -50,13 +47,43 @@ export const galleristsApi = {
   },
 
   update: async (id: string, data: UpdateGalleristRequest): Promise<Gallerist> => {
-    const backendData = mapFrontendGalleristToBackend({ ...data, id });
-    const response = await apiClient.post<RootEntity<any>>(`${GALLERIST_API}/save`, backendData);
+    const backendData = mapFrontendGalleristToBackend(data);
+    const response = await apiClient.put<RootEntity<any>>(`${GALLERIST_API}/update/${id}`, backendData);
     return mapBackendGalleristToFrontend(response.data.payload);
   },
 
   delete: async (id: string): Promise<void> => {
-    // Note: Backend doesn't have delete endpoint yet
-    throw new Error('Delete endpoint not implemented in backend yet');
+    await apiClient.delete(`${GALLERIST_API}/delete/${id}`);
+  },
+
+  // Helper: Create gallerist with address in one step
+  createWithAddress: async (data: GalleristWithAddressInput): Promise<Gallerist> => {
+    // First create the address
+    const address = await addressesApi.create(data.address);
+    
+    // Then create the gallerist with the address ID
+    return galleristsApi.create({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      addressId: address.id,
+    });
+  },
+
+  // Helper: Update gallerist with address
+  updateWithAddress: async (id: string, data: GalleristWithAddressInput & { addressId?: string }): Promise<Gallerist> => {
+    let addressId = data.addressId;
+    
+    // If no addressId provided, create new address
+    if (!addressId) {
+      const address = await addressesApi.create(data.address);
+      addressId = address.id;
+    }
+    
+    return galleristsApi.update(id, {
+      id: id,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      addressId: addressId,
+    });
   },
 };

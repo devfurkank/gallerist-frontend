@@ -5,7 +5,6 @@ export interface Gallerist {
   firstName: string;
   lastName: string;
   address?: Address;
-  addressId?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -13,9 +12,20 @@ export interface Gallerist {
 export interface CreateGalleristRequest {
   firstName: string;
   lastName: string;
-  addressId?: string;
+  addressId: string;
 }
 
 export interface UpdateGalleristRequest extends CreateGalleristRequest {
   id: string;
+}
+
+export interface GalleristWithAddressInput {
+  firstName: string;
+  lastName: string;
+  address: {
+    city: string;
+    district: string;
+    neighborhood: string;
+    street: string;
+  };
 }

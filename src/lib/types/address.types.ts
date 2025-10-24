@@ -4,7 +4,7 @@ export interface Address {
   district: string;
   neighborhood: string;
   street: string;
-  postalCode: string;
+  postalCode?: string; // Optional - not used in backend
   createdAt?: string;
   updatedAt?: string;
 }
@@ -14,7 +14,6 @@ export interface CreateAddressRequest {
   district: string;
   neighborhood: string;
   street: string;
-  postalCode: string;
 }
 
 export interface UpdateAddressRequest extends CreateAddressRequest {

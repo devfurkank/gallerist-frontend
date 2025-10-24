@@ -53,7 +53,7 @@ export const carsApi = {
 
   update: async (id: string, data: UpdateCarRequest): Promise<Car> => {
     const backendData = mapFrontendCarToBackend(data);
-    const response = await apiClient.post<RootEntity<any>>(`${CAR_API}/update/${id}`, backendData);
+    const response = await apiClient.put<RootEntity<any>>(`${CAR_API}/update/${id}`, backendData);
     return mapBackendCarToFrontend(response.data.payload);
   },
 
