@@ -17,6 +17,8 @@ import { AccountsListPage } from './pages/accounts/AccountsListPage';
 import { AccountFormPage } from './pages/accounts/AccountFormPage';
 import { CustomersListPage } from './pages/customers/CustomersListPage';
 import { CustomerFormPage } from './pages/customers/CustomerFormPage';
+import { InventoryListPage } from './pages/inventory/InventoryListPage';
+import { InventoryFormPage } from './pages/inventory/InventoryFormPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 
 const queryClient = new QueryClient({
@@ -71,10 +73,9 @@ function App() {
                 path="sales"
                 element={<PlaceholderPage title="Sales" description="Manage sales" />}
               />
-              <Route
-                path="inventory"
-                element={<PlaceholderPage title="Inventory" description="Manage car assignments" />}
-              />
+              <Route path="inventory" element={<InventoryListPage />} />
+              <Route path="inventory/new" element={<InventoryFormPage />} />
+              <Route path="inventory/:id/edit" element={<InventoryFormPage />} />
               <Route
                 path="analytics"
                 element={<PlaceholderPage title="Analytics" description="View reports and analytics" />}

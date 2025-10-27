@@ -4,19 +4,16 @@ import { Gallerist } from './gallerist.types';
 export interface GalleristCar {
   id: string;
   gallerist: Gallerist;
-  galleristId: string;
   car: Car;
-  carId: string;
-  assignedDate: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createTime?: string;
 }
 
 export interface CreateGalleristCarRequest {
-  galleristId: string;
-  carId: string;
+  galleristId: number;
+  carId: number;
 }
 
-export interface UpdateGalleristCarRequest extends CreateGalleristCarRequest {
-  id: string;
+export interface UpdateGalleristCarRequest {
+  galleristId: number;
+  carId: number;
 }

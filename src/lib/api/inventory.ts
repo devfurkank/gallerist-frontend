@@ -10,8 +10,15 @@ const mapBackendInventoryToFrontend = (backendInventory: any): GalleristCar => (
     id: backendInventory.gallerist.id?.toString() || '',
     firstName: backendInventory.gallerist.firstName || '',
     lastName: backendInventory.gallerist.lastName || '',
-    address: backendInventory.gallerist.address,
-  } : undefined,
+    address: backendInventory.gallerist.address ? {
+      id: backendInventory.gallerist.address.id?.toString() || '',
+      city: backendInventory.gallerist.address.city || '',
+      district: backendInventory.gallerist.address.district || '',
+      neighborhood: backendInventory.gallerist.address.neighborhood || '',
+      street: backendInventory.gallerist.address.street || '',
+      postalCode: backendInventory.gallerist.address.postalCode || '',
+    } : undefined,
+  } : {} as any,
   car: backendInventory.car ? {
     id: backendInventory.car.id?.toString() || '',
     plate: backendInventory.car.plaka || '', // plaka → plate
@@ -20,32 +27,21 @@ const mapBackendInventoryToFrontend = (backendInventory: any): GalleristCar => (
     productionYear: backendInventory.car.productionYear || 0,
     price: backendInventory.car.price || 0,
     currencyType: backendInventory.car.currencyType || 'TRY',
-    damagePrice: backendInventory.car.damagePrice,
+    damagePrice: backendInventory.car.damagePrice || 0,
     carStatusType: backendInventory.car.carStatusType || 'SALABLE',
-  } : undefined,
-  createdAt: backendInventory.createTime,
-  updatedAt: backendInventory.createTime,
+  } : {} as any,
+  createTime: backendInventory.createTime,
 });
 
-const mapFrontendInventoryToBackend = (frontendInventory: CreateGalleristCarRequest | UpdateGalleristCarRequest): any => ({
-  id: (frontendInventory as UpdateGalleristCarRequest).id,
-  gallerist: frontendInventory.gallerist ? {
-    id: frontendInventory.gallerist.id,
-  } : undefined,
-  car: frontendInventory.car ? {
-    id: frontendInventory.car.id,
-  } : undefined,
+const mapFrontendInventoryToBackend = (data: CreateGalleristCarRequest | UpdateGalleristCarRequest): any => ({
+  galleristId: data.galleristId,
+  carId: data.carId,
 });
 
 export const inventoryApi = {
   getAll: async (): Promise<GalleristCar[]> => {
-    // Note: Backend doesn't have list endpoint yet
-    throw new Error('List endpoint not implemented in backend yet');
-  },
-
-  getById: async (id: string): Promise<GalleristCar> => {
-    // Note: Backend doesn't have getById endpoint yet
-    throw new Error('GetById endpoint not implemented in backend yet');
+    const response = await apiClient.get<RootEntity<any[]>>(`${GALLERIST_CAR_API}/list`);
+    return response.data.payload.map(mapBackendInventoryToFrontend);
   },
 
   create: async (data: CreateGalleristCarRequest): Promise<GalleristCar> => {
@@ -55,13 +51,12 @@ export const inventoryApi = {
   },
 
   update: async (id: string, data: UpdateGalleristCarRequest): Promise<GalleristCar> => {
-    const backendData = mapFrontendInventoryToBackend({ ...data, id });
-    const response = await apiClient.post<RootEntity<any>>(`${GALLERIST_CAR_API}/save`, backendData);
+    const backendData = mapFrontendInventoryToBackend(data);
+    const response = await apiClient.put<RootEntity<any>>(`${GALLERIST_CAR_API}/update/${id}`, backendData);
     return mapBackendInventoryToFrontend(response.data.payload);
   },
 
   delete: async (id: string): Promise<void> => {
-    // Note: Backend doesn't have delete endpoint yet
-    throw new Error('Delete endpoint not implemented in backend yet');
+    await apiClient.delete<RootEntity<string>>(`${GALLERIST_CAR_API}/delete/${id}`);
   },
 };
