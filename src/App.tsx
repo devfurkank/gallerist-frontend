@@ -20,6 +20,8 @@ import { CustomerFormPage } from './pages/customers/CustomerFormPage';
 import { InventoryListPage } from './pages/inventory/InventoryListPage';
 import { InventoryFormPage } from './pages/inventory/InventoryFormPage';
 import { CurrencyRatesPage } from './pages/currency-rates/CurrencyRatesPage';
+import { SalesListPage } from './pages/sales/SalesListPage';
+import { SaleFormPage } from './pages/sales/SaleFormPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 
 const queryClient = new QueryClient({
@@ -70,10 +72,11 @@ function App() {
               <Route path="customers" element={<CustomersListPage />} />
               <Route path="customers/new" element={<CustomerFormPage />} />
               <Route path="customers/:id/edit" element={<CustomerFormPage />} />
-              <Route
-                path="sales"
-                element={<PlaceholderPage title="Sales" description="Manage sales" />}
-              />
+              
+              <Route path="sales" element={<SalesListPage />} />
+              <Route path="sales/new" element={<SaleFormPage />} />
+              <Route path="sales/:id/edit" element={<SaleFormPage />} />
+              
               <Route path="inventory" element={<InventoryListPage />} />
               <Route path="inventory/new" element={<InventoryFormPage />} />
               <Route path="inventory/:id/edit" element={<InventoryFormPage />} />

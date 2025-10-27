@@ -7,6 +7,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
+import { DeleteDialog } from '../../components/ui/delete-dialog';
 import { carsApi } from '../../lib/api/cars';
 import { formatCurrency } from '../../lib/utils/format';
 import type { Car } from '../../lib/types';
@@ -15,6 +16,10 @@ export function CarsListPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; car: Car | null }>({
+    open: false,
+    car: null,
+  });
 
   const { data: cars = [], isLoading } = useQuery({
     queryKey: ['cars'],
@@ -26,9 +31,11 @@ export function CarsListPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cars'] });
       toast.success('Car deleted successfully');
+      setDeleteDialog({ open: false, car: null });
     },
     onError: () => {
       toast.error('Failed to delete car');
+      setDeleteDialog({ open: false, car: null });
     },
   });
 
@@ -39,9 +46,13 @@ export function CarsListPage() {
       car.model.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this car?')) {
-      deleteMutation.mutate(id);
+  const handleDeleteClick = (car: Car) => {
+    setDeleteDialog({ open: true, car });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteDialog.car) {
+      deleteMutation.mutate(deleteDialog.car.id);
     }
   };
 
@@ -131,7 +142,7 @@ export function CarsListPage() {
                       size="sm"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDelete(car.id);
+                        handleDeleteClick(car);
                       }}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -143,6 +154,16 @@ export function CarsListPage() {
           ))}
         </div>
       )}
+
+      <DeleteDialog
+        open={deleteDialog.open}
+        onOpenChange={(open) => setDeleteDialog({ open, car: null })}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Car"
+        description="Are you sure you want to delete this car? This action cannot be undone."
+        itemName={deleteDialog.car ? `${deleteDialog.car.brand} ${deleteDialog.car.model} (${deleteDialog.car.plate})` : ''}
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 }

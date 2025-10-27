@@ -7,6 +7,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
+import { DeleteDialog } from '../../components/ui/delete-dialog';
 import { addressesApi } from '../../lib/api/addresses';
 import type { Address } from '../../lib/types';
 
@@ -14,6 +15,10 @@ export function AddressesListPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; address: Address | null }>({
+    open: false,
+    address: null,
+  });
 
   const { data: addresses = [], isLoading } = useQuery({
     queryKey: ['addresses'],
@@ -25,9 +30,11 @@ export function AddressesListPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['addresses'] });
       toast.success('Address deleted successfully');
+      setDeleteDialog({ open: false, address: null });
     },
     onError: () => {
       toast.error('Failed to delete address');
+      setDeleteDialog({ open: false, address: null });
     },
   });
 
@@ -39,9 +46,13 @@ export function AddressesListPage() {
       address.street.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this address?')) {
-      deleteMutation.mutate(id);
+  const handleDeleteClick = (address: Address) => {
+    setDeleteDialog({ open: true, address });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteDialog.address) {
+      deleteMutation.mutate(deleteDialog.address.id);
     }
   };
 
@@ -159,7 +170,7 @@ export function AddressesListPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleDelete(address.id)}
+                            onClick={() => handleDeleteClick(address)}
                             disabled={deleteMutation.isPending}
                             title="Delete address"
                             className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
@@ -185,6 +196,16 @@ export function AddressesListPage() {
           </p>
         </div>
       )}
+
+      <DeleteDialog
+        open={deleteDialog.open}
+        onOpenChange={(open) => setDeleteDialog({ open, address: null })}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Address"
+        description="Are you sure you want to delete this address? This action cannot be undone."
+        itemName={deleteDialog.address ? `${deleteDialog.address.city}, ${deleteDialog.address.district}` : ''}
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 }

@@ -4,25 +4,23 @@ import { Customer } from './customer.types';
 
 export interface Sale {
   id: string;
-  car: Car;
-  carId: string;
-  gallerist: Gallerist;
-  galleristId: string;
-  customer: Customer;
-  customerId: string;
-  saleDate: string;
-  createdAt?: string;
+  car?: Car;
+  gallerist?: Gallerist;
+  customer?: Customer;
+  createTime?: string;
   updatedAt?: string;
 }
 
 export interface CreateSaleRequest {
-  carId: string;
-  galleristId: string;
-  customerId: string;
+  carId: number;
+  galleristId: number;
+  customerId: number;
 }
 
-export interface UpdateSaleRequest extends CreateSaleRequest {
-  id: string;
+export interface UpdateSaleRequest {
+  carId: number;
+  galleristId: number;
+  customerId: number;
 }
 
 export interface SaleFilters {

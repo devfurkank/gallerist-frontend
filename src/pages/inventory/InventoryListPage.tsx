@@ -7,6 +7,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
+import { DeleteDialog } from '../../components/ui/delete-dialog';
 import { inventoryApi } from '../../lib/api/inventory';
 import { formatCurrency } from '../../lib/utils/format';
 import type { GalleristCar } from '../../lib/types';
@@ -15,6 +16,10 @@ export function InventoryListPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; item: GalleristCar | null }>({
+    open: false,
+    item: null,
+  });
 
   const { data: inventory = [], isLoading } = useQuery({
     queryKey: ['inventory'],
@@ -26,9 +31,11 @@ export function InventoryListPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['inventory'] });
       toast.success('Car assignment deleted successfully');
+      setDeleteDialog({ open: false, item: null });
     },
     onError: () => {
       toast.error('Failed to delete car assignment');
+      setDeleteDialog({ open: false, item: null });
     },
   });
 
@@ -43,9 +50,13 @@ export function InventoryListPage() {
     );
   });
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to remove this car assignment?')) {
-      deleteMutation.mutate(id);
+  const handleDeleteClick = (item: GalleristCar) => {
+    setDeleteDialog({ open: true, item });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteDialog.item) {
+      deleteMutation.mutate(deleteDialog.item.id);
     }
   };
 
@@ -160,7 +171,7 @@ export function InventoryListPage() {
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => handleDeleteClick(item)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -171,6 +182,16 @@ export function InventoryListPage() {
           ))}
         </div>
       )}
+
+      <DeleteDialog
+        open={deleteDialog.open}
+        onOpenChange={(open) => setDeleteDialog({ open, item: null })}
+        onConfirm={handleDeleteConfirm}
+        title="Remove Car Assignment"
+        description="Are you sure you want to remove this car assignment? This action cannot be undone."
+        itemName={deleteDialog.item ? `${deleteDialog.item.car?.brand} ${deleteDialog.item.car?.model} - ${deleteDialog.item.gallerist?.firstName} ${deleteDialog.item.gallerist?.lastName}` : ''}
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 }

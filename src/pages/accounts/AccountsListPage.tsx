@@ -7,6 +7,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Card, CardContent, CardHeader } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
+import { DeleteDialog } from '../../components/ui/delete-dialog';
 import { accountsApi } from '../../lib/api/accounts';
 import type { Account } from '../../lib/types';
 
@@ -14,6 +15,10 @@ export function AccountsListPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; account: Account | null }>({
+    open: false,
+    account: null,
+  });
 
   const { data: accounts = [], isLoading } = useQuery({
     queryKey: ['accounts'],
@@ -25,9 +30,11 @@ export function AccountsListPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       toast.success('Account deleted successfully');
+      setDeleteDialog({ open: false, account: null });
     },
     onError: () => {
       toast.error('Failed to delete account');
+      setDeleteDialog({ open: false, account: null });
     },
   });
 
@@ -37,9 +44,13 @@ export function AccountsListPage() {
       account.iban.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this account?')) {
-      deleteMutation.mutate(id);
+  const handleDeleteClick = (account: Account) => {
+    setDeleteDialog({ open: true, account });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteDialog.account) {
+      deleteMutation.mutate(deleteDialog.account.id);
     }
   };
 
@@ -173,7 +184,7 @@ export function AccountsListPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleDelete(account.id)}
+                            onClick={() => handleDeleteClick(account)}
                             disabled={deleteMutation.isPending}
                             title="Delete account"
                             className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
@@ -199,6 +210,16 @@ export function AccountsListPage() {
           </p>
         </div>
       )}
+
+      <DeleteDialog
+        open={deleteDialog.open}
+        onOpenChange={(open) => setDeleteDialog({ open, account: null })}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Account"
+        description="Are you sure you want to delete this account? This action cannot be undone."
+        itemName={deleteDialog.account ? `${deleteDialog.account.accountNo}` : ''}
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 }

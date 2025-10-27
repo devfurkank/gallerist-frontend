@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { DeleteDialog } from '../../components/ui/delete-dialog';
 import { galleristsApi } from '../../lib/api/gallerists';
 import type { Gallerist } from '../../lib/types';
 
@@ -13,6 +14,10 @@ export function GalleristsListPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; gallerist: Gallerist | null }>({
+    open: false,
+    gallerist: null,
+  });
 
   const { data: gallerists = [], isLoading } = useQuery({
     queryKey: ['gallerists'],
@@ -24,9 +29,11 @@ export function GalleristsListPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['gallerists'] });
       toast.success('Gallerist deleted successfully');
+      setDeleteDialog({ open: false, gallerist: null });
     },
     onError: () => {
       toast.error('Failed to delete gallerist');
+      setDeleteDialog({ open: false, gallerist: null });
     },
   });
 
@@ -37,9 +44,13 @@ export function GalleristsListPage() {
       gallerist.address?.city.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this gallerist?')) {
-      deleteMutation.mutate(id);
+  const handleDeleteClick = (gallerist: Gallerist) => {
+    setDeleteDialog({ open: true, gallerist });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteDialog.gallerist) {
+      deleteMutation.mutate(deleteDialog.gallerist.id);
     }
   };
 
@@ -124,7 +135,7 @@ export function GalleristsListPage() {
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => handleDelete(gallerist.id)}
+                      onClick={() => handleDeleteClick(gallerist)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -135,6 +146,16 @@ export function GalleristsListPage() {
           ))}
         </div>
       )}
+
+      <DeleteDialog
+        open={deleteDialog.open}
+        onOpenChange={(open) => setDeleteDialog({ open, gallerist: null })}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Gallerist"
+        description="Are you sure you want to delete this gallerist? This action cannot be undone."
+        itemName={deleteDialog.gallerist ? `${deleteDialog.gallerist.firstName} ${deleteDialog.gallerist.lastName}` : ''}
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 }

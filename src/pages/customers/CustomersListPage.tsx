@@ -7,6 +7,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Card, CardContent, CardHeader } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
+import { DeleteDialog } from '../../components/ui/delete-dialog';
 import { customersApi } from '../../lib/api/customers';
 import type { Customer } from '../../lib/types';
 
@@ -14,6 +15,10 @@ export function CustomersListPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; customer: Customer | null }>({
+    open: false,
+    customer: null,
+  });
 
   const { data: customers = [], isLoading } = useQuery({
     queryKey: ['customers'],
@@ -25,9 +30,11 @@ export function CustomersListPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       toast.success('Customer deleted successfully');
+      setDeleteDialog({ open: false, customer: null });
     },
     onError: () => {
       toast.error('Failed to delete customer');
+      setDeleteDialog({ open: false, customer: null });
     },
   });
 
@@ -38,9 +45,13 @@ export function CustomersListPage() {
       customer.tckn.includes(search)
   );
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this customer?')) {
-      deleteMutation.mutate(id);
+  const handleDeleteClick = (customer: Customer) => {
+    setDeleteDialog({ open: true, customer });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteDialog.customer) {
+      deleteMutation.mutate(deleteDialog.customer.id);
     }
   };
 
@@ -207,8 +218,7 @@ export function CustomersListPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleDelete(customer.id)}
-                            disabled={deleteMutation.isPending}
+                            onClick={() => handleDeleteClick(customer)}
                             title="Delete customer"
                             className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
                           >
@@ -233,6 +243,16 @@ export function CustomersListPage() {
           </p>
         </div>
       )}
+
+      <DeleteDialog
+        open={deleteDialog.open}
+        onOpenChange={(open) => setDeleteDialog({ open, customer: null })}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Customer"
+        description="Are you sure you want to delete this customer? This action cannot be undone."
+        itemName={deleteDialog.customer ? `${deleteDialog.customer.firstName} ${deleteDialog.customer.lastName} (${deleteDialog.customer.tckn})` : ''}
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 }
