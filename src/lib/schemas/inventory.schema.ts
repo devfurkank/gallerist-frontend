@@ -11,3 +11,4 @@ export const galleristCarSchema = z.object({
 
 export type GalleristCarFormData = z.infer<typeof galleristCarSchema>;
 
+

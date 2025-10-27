@@ -1,6 +1,7 @@
 export * from './common.types';
 export * from './api.types';
 export * from './car.types';
+export * from './currency-rates.types';
 export * from './gallerist.types';
 export * from './customer.types';
 export * from './account.types';

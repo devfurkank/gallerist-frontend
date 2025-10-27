@@ -19,6 +19,7 @@ import { CustomersListPage } from './pages/customers/CustomersListPage';
 import { CustomerFormPage } from './pages/customers/CustomerFormPage';
 import { InventoryListPage } from './pages/inventory/InventoryListPage';
 import { InventoryFormPage } from './pages/inventory/InventoryFormPage';
+import { CurrencyRatesPage } from './pages/currency-rates/CurrencyRatesPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 
 const queryClient = new QueryClient({
@@ -76,10 +77,7 @@ function App() {
               <Route path="inventory" element={<InventoryListPage />} />
               <Route path="inventory/new" element={<InventoryFormPage />} />
               <Route path="inventory/:id/edit" element={<InventoryFormPage />} />
-              <Route
-                path="analytics"
-                element={<PlaceholderPage title="Analytics" description="View reports and analytics" />}
-              />
+              <Route path="currency-rates" element={<CurrencyRatesPage />} />
               <Route
                 path="settings"
                 element={<PlaceholderPage title="Settings" description="Application settings" />}

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Car, LayoutDashboard, Users, UserCircle, ShoppingCart, Wallet, MapPin, Package, BarChart3, Settings as SettingsIcon } from 'lucide-react';
+import { Car, LayoutDashboard, Users, UserCircle, ShoppingCart, Wallet, MapPin, Package, Settings as SettingsIcon, DollarSign } from 'lucide-react';
 import { cn } from '../../lib/utils/cn';
 
 const navItems = [
@@ -11,7 +11,7 @@ const navItems = [
   { to: '/dashboard/inventory', icon: Package, label: 'Inventory' },
   { to: '/dashboard/accounts', icon: Wallet, label: 'Accounts' },
   { to: '/dashboard/addresses', icon: MapPin, label: 'Addresses' },
-  { to: '/dashboard/analytics', icon: BarChart3, label: 'Analytics' },
+  { to: '/dashboard/currency-rates', icon: DollarSign, label: 'Currency Rates' },
   { to: '/dashboard/settings', icon: SettingsIcon, label: 'Settings' },
 ];
 
