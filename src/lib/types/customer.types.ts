@@ -8,9 +8,7 @@ export interface Customer {
   tckn: string;
   birthDate: string;
   address?: Address;
-  addressId?: string;
   account?: Account;
-  accountId?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -20,10 +18,15 @@ export interface CreateCustomerRequest {
   lastName: string;
   tckn: string;
   birthDate: string;
-  addressId?: string;
-  accountId?: string;
+  addressId: string;
+  accountId: string;
 }
 
-export interface UpdateCustomerRequest extends CreateCustomerRequest {
-  id: string;
+export interface UpdateCustomerRequest {
+  firstName: string;
+  lastName: string;
+  tckn: string;
+  birthDate: string;
+  addressId: string;
+  accountId: string;
 }

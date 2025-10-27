@@ -16,49 +16,43 @@ const mapBackendCustomerToFrontend = (backendCustomer: any): Customer => ({
     district: backendCustomer.address.district || '',
     neighborhood: backendCustomer.address.neighborhood || '',
     street: backendCustomer.address.street || '',
+    createdAt: backendCustomer.address.createTime,
+    updatedAt: backendCustomer.address.updateTime,
   } : undefined,
   account: backendCustomer.account ? {
     id: backendCustomer.account.id?.toString() || '',
     accountNo: backendCustomer.account.accountNo || '',
     iban: backendCustomer.account.iban || '',
     amount: backendCustomer.account.amount || 0,
-    currencyType: backendCustomer.account.currencyType || 'TRY',
+    currencyType: backendCustomer.account.currencyType || 'TL',
+    createdAt: backendCustomer.account.createTime,
+    updatedAt: backendCustomer.account.updateTime,
   } : undefined,
   createdAt: backendCustomer.createTime,
-  updatedAt: backendCustomer.createTime,
+  updatedAt: backendCustomer.updateTime,
 });
 
 const mapFrontendCustomerToBackend = (frontendCustomer: CreateCustomerRequest | UpdateCustomerRequest): any => ({
-  id: (frontendCustomer as UpdateCustomerRequest).id,
   firstName: frontendCustomer.firstName,
   lastName: frontendCustomer.lastName,
   tckn: frontendCustomer.tckn,
   birthDate: frontendCustomer.birthDate,
-  address: frontendCustomer.address ? {
-    id: frontendCustomer.address.id,
-    city: frontendCustomer.address.city,
-    district: frontendCustomer.address.district,
-    neighborhood: frontendCustomer.address.neighborhood,
-    street: frontendCustomer.address.street,
-  } : undefined,
-  account: frontendCustomer.account ? {
-    id: frontendCustomer.account.id,
-    accountNo: frontendCustomer.account.accountNo,
-    iban: frontendCustomer.account.iban,
-    amount: frontendCustomer.account.amount,
-    currencyType: frontendCustomer.account.currencyType,
-  } : undefined,
+  addressId: parseInt(frontendCustomer.addressId),
+  accountId: parseInt(frontendCustomer.accountId),
 });
 
 export const customersApi = {
   getAll: async (): Promise<Customer[]> => {
-    // Note: Backend doesn't have list endpoint yet
-    throw new Error('List endpoint not implemented in backend yet');
+    const response = await apiClient.get<RootEntity<any[]>>(`${CUSTOMER_API}/list`);
+    return response.data.payload.map(mapBackendCustomerToFrontend);
   },
 
   getById: async (id: string): Promise<Customer> => {
-    // Note: Backend doesn't have getById endpoint yet
-    throw new Error('GetById endpoint not implemented in backend yet');
+    // Backend doesn't have getById, so we'll fetch all and find the one we need
+    const customers = await customersApi.getAll();
+    const found = customers.find((c) => c.id === id);
+    if (!found) throw new Error('Customer not found');
+    return found;
   },
 
   create: async (data: CreateCustomerRequest): Promise<Customer> => {
@@ -68,13 +62,12 @@ export const customersApi = {
   },
 
   update: async (id: string, data: UpdateCustomerRequest): Promise<Customer> => {
-    const backendData = mapFrontendCustomerToBackend({ ...data, id });
-    const response = await apiClient.post<RootEntity<any>>(`${CUSTOMER_API}/save`, backendData);
+    const backendData = mapFrontendCustomerToBackend(data);
+    const response = await apiClient.put<RootEntity<any>>(`${CUSTOMER_API}/update/${id}`, backendData);
     return mapBackendCustomerToFrontend(response.data.payload);
   },
 
   delete: async (id: string): Promise<void> => {
-    // Note: Backend doesn't have delete endpoint yet
-    throw new Error('Delete endpoint not implemented in backend yet');
+    await apiClient.delete<RootEntity<string>>(`${CUSTOMER_API}/delete/${id}`);
   },
 };

@@ -18,7 +18,7 @@ const navItems = [
 export function Sidebar() {
   return (
     <aside className="hidden lg:flex flex-col w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 h-screen sticky top-0">
-      <div className="p-6 border-b border-gray-200 dark:border-gray-800">
+      <div className="h-20 px-6 border-b border-gray-200 dark:border-gray-800 flex items-center">
         <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
           <Car className="h-8 w-8" />
           <span className="text-2xl font-bold">Gallerist</span>

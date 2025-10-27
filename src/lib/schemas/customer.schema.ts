@@ -8,8 +8,8 @@ export const customerSchema = z.object({
     message: 'Invalid TCKN',
   }),
   birthDate: z.string().min(1, 'Birth date is required'),
-  addressId: z.string().optional(),
-  accountId: z.string().optional(),
+  addressId: z.string().min(1, 'Address is required'),
+  accountId: z.string().min(1, 'Account is required'),
 });
 
 export type CustomerFormData = z.infer<typeof customerSchema>;

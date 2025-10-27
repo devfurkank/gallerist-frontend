@@ -15,6 +15,8 @@ import { AddressesListPage } from './pages/addresses/AddressesListPage';
 import { AddressFormPage } from './pages/addresses/AddressFormPage';
 import { AccountsListPage } from './pages/accounts/AccountsListPage';
 import { AccountFormPage } from './pages/accounts/AccountFormPage';
+import { CustomersListPage } from './pages/customers/CustomersListPage';
+import { CustomerFormPage } from './pages/customers/CustomerFormPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 
 const queryClient = new QueryClient({
@@ -62,10 +64,9 @@ function App() {
               <Route path="accounts/new" element={<AccountFormPage />} />
               <Route path="accounts/:id/edit" element={<AccountFormPage />} />
               
-              <Route
-                path="customers"
-                element={<PlaceholderPage title="Customers" description="Manage customers" />}
-              />
+              <Route path="customers" element={<CustomersListPage />} />
+              <Route path="customers/new" element={<CustomerFormPage />} />
+              <Route path="customers/:id/edit" element={<CustomerFormPage />} />
               <Route
                 path="sales"
                 element={<PlaceholderPage title="Sales" description="Manage sales" />}
