@@ -56,7 +56,7 @@ export function DashboardHome() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   {stat.title}
@@ -66,18 +66,18 @@ export function DashboardHome() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="min-h-[4rem]">
+                <div className="min-h-[4rem] flex items-center">
                   {stat.isRevenue ? (
-                    <div className="space-y-1">
+                    <div className="space-y-1 w-full">
                       <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                        {formatCurrency(stat.value.usd, 'USD')}
+                        {formatCurrency((stat.value as any).usd, 'USD')}
                       </div>
                       <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        {formatCurrency(stat.value.tl, 'TL')}
+                        {formatCurrency((stat.value as any).tl, 'TL')}
                       </div>
                     </div>
                   ) : (
-                    <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stat.value}</div>
+                    <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stat.value as number}</div>
                   )}
                 </div>
               </CardContent>
